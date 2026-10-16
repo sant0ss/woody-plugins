@@ -1,0 +1,6 @@
+build/
+kits/
+.vs/
+.vscode/
+*.user
+build.log
