@@ -73,7 +73,20 @@ Sequence makeSequence (const Pattern&, float swing);
 Sequence makeSequence (const std::vector<SongPart>&, float swing);
 
 // Writes a .mid file to the temp folder and returns it, ready to be dragged into the DAW.
-juce::File writeMidiFile (const Sequence&, const juce::String& name);
+// timing 0..1 pushes notes slightly early or late, like a human drummer.
+juce::File writeMidiFile (const Sequence&, const juce::String& name, float timing = 0.0f);
+
+// 0 simple, 1 medium, 2 busy
+int complexityOf (const Pattern&);
+
+// Typical tempo range of a genre, e.g. "90-140 BPM"
+juce::String suggestedTempo (const juce::String& genre);
+
+// A new take on a groove: ghost notes, kick pickups, open hats... Different for every seed.
+Pattern makeVariation (const Pattern&, int seed);
+
+// The groove with a fill on its last one or two beats.
+Pattern makeFill (const Pattern&, int seed);
 
 // Grooves that ship with the plugin.
 const std::vector<Pattern>& builtInPatterns();

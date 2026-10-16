@@ -178,16 +178,19 @@ Sequence makeSequence (const std::vector<SongPart>& parts, float swing)
     return seq;
 }
 
-juce::File writeMidiFile (const Sequence& seq, const juce::String& name)
+juce::File writeMidiFile (const Sequence& seq, const juce::String& name, float timing)
 {
     constexpr int ticksPerBeat = 960;
+    juce::Random random;
 
     juce::MidiMessageSequence track;
     track.addEvent (juce::MidiMessage::timeSignatureMetaEvent (4, 4), 0.0);
 
     for (const auto& e : seq.events)
     {
-        const double start = e.beat * ticksPerBeat;
+        // Up to about 1/50 of a beat early or late
+        const double jitter = timing > 0.0f ? (random.nextDouble() * 2.0 - 1.0) * 0.02 * timing : 0.0;
+        const double start = juce::jmax (0.0, e.beat + jitter) * ticksPerBeat;
         track.addEvent (juce::MidiMessage::noteOn (1, e.note, (juce::uint8) e.velocity), start);
         track.addEvent (juce::MidiMessage::noteOff (1, e.note), start + ticksPerBeat / 8.0);
     }
@@ -212,6 +215,176 @@ juce::File writeMidiFile (const Sequence& seq, const juce::String& name)
         midi.writeTo (out);
 
     return file;
+}
+
+//==============================================================================
+int complexityOf (const Pattern& p)
+{
+    const float hitsPerBar = (float) p.hits.size() / (float) juce::jmax (1, p.bars);
+    return hitsPerBar <= 13.0f ? 0 : hitsPerBar <= 22.0f ? 1 : 2;
+}
+
+juce::String suggestedTempo (const juce::String& genre)
+{
+    static const std::pair<const char*, const char*> tempos[] = {
+        { "Rock", "90-140" },       { "Pop", "90-125" },      { "Funk", "90-115" },
+        { "Shuffle", "80-130" },    { "Jazz", "100-220" },    { "Bossa Nova", "110-140" },
+        { "Samba", "90-110" },      { "Hip Hop", "80-95" },   { "Reggae", "70-90" },
+        { "Metal", "140-220" },     { "Balada", "60-80" },    { "Disco", "110-128" },
+        { "Funk Carioca", "125-135" },
+    };
+
+    for (const auto& [name, range] : tempos)
+        if (genre == name)
+            return juce::String (range) + " BPM";
+
+    if (genre == juce::String::fromUTF8 ("Baião"))
+        return "85-120 BPM";
+
+    return {};
+}
+
+namespace
+{
+constexpr int kickNote = 36, snareNote = 38, closedHat = 42, openHat = 46, rideNote = 51, rideBell = 53;
+constexpr int tom1Note = 48, tom2Note = 45, floorNote = 41;
+
+int countHits (const Pattern& p, int note)
+{
+    return (int) std::count_if (p.hits.begin(), p.hits.end(), [note] (const Hit& h) { return h.note == note; });
+}
+} // namespace
+
+Pattern makeVariation (const Pattern& source, int seed)
+{
+    Pattern p = source;
+    juce::Random rng (seed);
+
+    const int stepsPerBeat = juce::jmax (1, p.stepsPerBar / 4);
+    const bool usesSnare = countHits (p, snareNote) > 0;
+    const int timekeeper = countHits (p, rideNote) > countHits (p, closedHat) ? rideNote : closedHat;
+
+    auto isEmpty = [&p] (int step, int note) { return p.velocityAt (step, note) == 0; };
+
+    for (int bar = 0; bar < p.bars; ++bar)
+    {
+        const int base = bar * p.stepsPerBar;
+
+        // Ghost notes on the snare between the main hits
+        if (usesSnare)
+        {
+            const int ghosts = 1 + rng.nextInt (3);
+            for (int g = 0; g < ghosts; ++g)
+            {
+                const int step = base + rng.nextInt (p.stepsPerBar);
+                if (step % stepsPerBeat != 0 && isEmpty (step, snareNote) && isEmpty (step, kickNote))
+                    p.setHit (step, snareNote, 36 + rng.nextInt (14));
+            }
+        }
+
+        // A kick pickup on an off-beat
+        if (rng.nextFloat() < 0.65f)
+        {
+            const int step = base + rng.nextInt (p.stepsPerBar);
+            if (step % stepsPerBeat != 0 && isEmpty (step, snareNote) && isEmpty (step, kickNote))
+                p.setHit (step, kickNote, 80 + rng.nextInt (25));
+        }
+
+        // Drop a kick that is not on the downbeat
+        if (rng.nextFloat() < 0.3f)
+        {
+            std::vector<int> kicks;
+            for (const auto& h : p.hits)
+                if (h.note == kickNote && h.step > base && h.step < base + p.stepsPerBar)
+                    kicks.push_back (h.step);
+            if (kicks.size() > 1)
+                p.setHit (kicks[(size_t) rng.nextInt ((int) kicks.size())], kickNote, 0);
+        }
+
+        if (timekeeper == closedHat && countHits (source, closedHat) > 0)
+        {
+            // Open the hi-hat on the last off-beat of the bar
+            if (rng.nextFloat() < 0.55f)
+            {
+                const int step = base + p.stepsPerBar - juce::jmax (1, stepsPerBeat / 2);
+                p.setHit (step, closedHat, 0);
+                p.setHit (step, openHat, 95);
+            }
+
+            // Extra soft hi-hat notes
+            if (rng.nextFloat() < 0.45f)
+            {
+                const int step = base + rng.nextInt (p.stepsPerBar);
+                if (isEmpty (step, closedHat) && isEmpty (step, openHat))
+                    p.setHit (step, closedHat, 55 + rng.nextInt (15));
+            }
+        }
+        else if (timekeeper == rideNote && rng.nextFloat() < 0.5f)
+        {
+            // Bell accent on a beat
+            const int step = base + rng.nextInt (4) * stepsPerBeat;
+            if (! isEmpty (step, rideNote))
+            {
+                p.setHit (step, rideNote, 0);
+                p.setHit (step, rideBell, 105);
+            }
+        }
+    }
+
+    p.name = source.name + juce::String::fromUTF8 (" (variação)");
+    return p;
+}
+
+Pattern makeFill (const Pattern& source, int seed)
+{
+    Pattern p = source;
+    juce::Random rng (seed);
+
+    const int stepsPerBeat = juce::jmax (1, p.stepsPerBar / 4);
+    const int beats = rng.nextFloat() < 0.5f ? 1 : 2;
+    const int start = p.totalSteps() - beats * stepsPerBeat;
+    const int length = p.totalSteps() - start;
+
+    p.hits.erase (std::remove_if (p.hits.begin(), p.hits.end(), [start] (const Hit& h) { return h.step >= start; }), p.hits.end());
+
+    const int style = rng.nextInt (4);
+    static const int toms[] = { tom1Note, tom2Note, floorNote };
+
+    // Long fills on a 16th grid use 8ths in the first half so they breathe
+    for (int i = 0; i < length; ++i)
+    {
+        const int step = start + i;
+        const float progress = (float) i / (float) juce::jmax (1, length - 1);
+        const int velocity = juce::jlimit (40, 127, 70 + (int) (progress * 50.0f) + rng.nextInt (8));
+
+        switch (style)
+        {
+            case 0: // snare roll that grows
+                p.setHit (step, snareNote, velocity);
+                break;
+
+            case 1: // down the toms
+                p.setHit (step, toms[juce::jmin (2, i * 3 / length)], velocity);
+                break;
+
+            case 2: // snare pairs then toms
+                p.setHit (step, (i / 2) % 4 == 0 ? snareNote : toms[juce::jmin (2, ((i / 2) % 4) - 1)], velocity);
+                break;
+
+            default: // syncopated: two hits and a kick
+                if (i % 3 == 2)
+                    p.setHit (step, kickNote, 100);
+                else
+                    p.setHit (step, i % 3 == 0 ? snareNote : toms[juce::jmin (2, i * 3 / length)], velocity);
+                break;
+        }
+    }
+
+    // Weight at the start of the fill
+    p.setHit (start, kickNote, 105);
+
+    p.name = source.name + " + virada";
+    return p;
 }
 
 //==============================================================================

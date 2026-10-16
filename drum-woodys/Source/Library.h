@@ -32,8 +32,8 @@ public:
     const Instrument* find (const juce::String& id) const;
     std::vector<const Instrument*> instrumentsFor (int slot) const;
 
-    // What a fresh kit uses for this slot ("" when nothing fits)
-    juce::String defaultFor (int slot) const;
+    // What a kit built around mainKit uses for this slot ("" when nothing fits)
+    juce::String defaultFor (int slot, const juce::String& mainKit = "Black Pearl") const;
 
 private:
     juce::File folder;

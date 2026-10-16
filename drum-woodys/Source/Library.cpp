@@ -197,13 +197,12 @@ std::vector<const Instrument*> Library::instrumentsFor (int slot) const
     return result;
 }
 
-juce::String Library::defaultFor (int slot) const
+juce::String Library::defaultFor (int slot, const juce::String& mainKit) const
 {
     const auto candidates = instrumentsFor (slot);
     if (candidates.empty())
         return {};
 
-    const juce::String mainKit ("Black Pearl");
 
     auto pick = [&] (auto&& predicate, int skip = 0) -> const Instrument*
     {
@@ -243,9 +242,10 @@ juce::String Library::defaultFor (int slot) const
     switch (slot)
     {
         case tom1:
-            // A smaller tom from another kit gives the set three different toms
-            for (const auto* inst : candidates)
-                if (inst->kitName == "Blonde Bop" && ! isFloor (*inst)) { chosen = inst; break; }
+            // The default kit borrows a smaller tom from another kit to get three different toms
+            if (mainKit == "Black Pearl")
+                for (const auto* inst : candidates)
+                    if (inst->kitName == "Blonde Bop" && ! isFloor (*inst)) { chosen = inst; break; }
             if (chosen == nullptr) chosen = pick ([&] (const Instrument& i) { return ! isFloor (i); });
             break;
         case tom2:     chosen = pick ([&] (const Instrument& i) { return ! isFloor (i); }); break;
@@ -327,6 +327,10 @@ std::shared_ptr<const Kit> Kit::build (const Library& library, const std::array<
                 layer.hiRand = region.hiRand;
                 slot.articulations[(size_t) a].push_back (std::move (layer));
             }
+
+            // Softest layer first, so neighbouring layers are neighbouring dynamics
+            auto& layers = slot.articulations[(size_t) a];
+            std::stable_sort (layers.begin(), layers.end(), [] (const KitLayer& x, const KitLayer& y) { return x.loVel < y.loVel; });
         }
     }
 

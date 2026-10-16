@@ -8,14 +8,21 @@ Audio plugins (VST3) built with [JUCE](https://juce.com).
 
 ### Drum Woodys
 
-- **Kit** – 14 slots (kick, snare, hi-hat, 3 toms, 2 crashes, ride, FX cymbal, 4 percussion). Each slot takes a piece
-  from any kit in the library, with articulations (snare rim/side stick, hi-hat closed/pedal/open/swish, ride bell/edge,
-  cymbal chokes), velocity layers and tuning. Pads show their MIDI note.
-- **Mixer** – level, pan, room send, mute and solo per slot; master, ambience, room size and humanize.
+- **Kit** – abstract kit map with 14 slots (kick, snare, hi-hat, 3 toms, 2 crashes, ride, FX cymbal, 4 percussion).
+  Each slot takes a piece from any kit in the library, with articulations (snare rim/side stick, hi-hat
+  closed/pedal/open/swish, ride bell/edge, cymbal chokes), velocity layers and tuning. Per-slot panel with 3-band EQ,
+  compressor, transient shaper (attack/sustain), drive, overhead/room sends and an optional separate output.
+- **Kit presets** – factory kits plus your own saved kits (pieces, mixer and effects).
+- **Mixer** – level, pan, mute, solo and peak meters per slot; Overhead and Room buses; master glue compressor and
+  soft limiter; humanize and variation (keeps repeated hits from sounding identical).
+- **Multi-out** – 14 extra stereo outputs, one per slot, for mixing pieces on separate DAW tracks.
 - **Grooves** – 50 patterns in 13 styles (rock, pop, funk, shuffle, jazz, bossa nova, samba, baião, reggae, hip hop,
-  metal, ballad, disco, funk carioca). Preview in sync with the host and drag the MIDI into a track.
-- **Editor** – step grid to build or tweak grooves (1/2/4 bars, 16ths, 8ths or triplets), saved to "Meus padrões".
-- **Música** – chain parts with repeats into a song, play it and drag the whole song as one MIDI clip.
+  metal, ballad, disco, funk carioca), filter by complexity, suggested tempo, one-click variations and fills, swing and
+  human timing. Preview in sync with the host and drag the MIDI into a track.
+- **Editor** – step grid with undo/redo to build or tweak grooves (1/2/4 bars, 16ths, 8ths or triplets), saved to
+  "Meus padrões".
+- **Música** – chain parts with repeats into a song, play it and drag the whole song, or a single part, as MIDI.
+- Resizable window; the layout scales with it.
 
 MIDI map: General MIDI for the main hits (36 kick, 38 snare, 42/44/46 hi-hat, 48/45/41 toms, 49/57 crashes, 51/53/59 ride).
 

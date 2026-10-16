@@ -15,7 +15,9 @@ juce_add_plugin(DrumWoodys
 target_sources(DrumWoodys PRIVATE
     Source/PluginProcessor.cpp
     Source/PluginEditor.cpp
-    Source/Pages.cpp
+    Source/KitPages.cpp
+    Source/GroovePages.cpp
+    Source/Presets.cpp
     Source/UiComponents.cpp
     Source/SfzParser.cpp
     Source/Library.cpp

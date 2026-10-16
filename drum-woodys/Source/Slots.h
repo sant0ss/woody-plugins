@@ -55,26 +55,27 @@ struct SlotDef
     std::array<ArticulationDef, maxArticulations> articulations;
     float defaultPan;
     float defaultRoom;
+    float defaultOverhead; // how much of the piece the overhead mics pick up
 };
 
 // MIDI map: General MIDI for the main hits, spare low notes for chokes and extras.
 inline const std::array<SlotDef, numSlots>& slotDefs()
 {
     static const std::array<SlotDef, numSlots> defs {{
-        { "kick",   "Kick",      kickType,  1, {{ { "Hit", 36 } }},                                                        0.00f, 0.10f },
-        { "snare",  "Snare",     snareType, 3, {{ { "Hit", 38 }, { "Rim", 40 }, { "Side Stick", 37 } }},                  -0.10f, 0.30f },
-        { "hihat",  "Hi-Hat",    hihatType, 4, {{ { "Closed", 42 }, { "Pedal", 44 }, { "Open", 46 }, { "Swish", 26 } }},  -0.35f, 0.15f },
-        { "tom1",   "Tom 1",     tomType,   2, {{ { "Hit", 48 }, { "Rim", 50 } }},                                        -0.15f, 0.30f },
-        { "tom2",   "Tom 2",     tomType,   2, {{ { "Hit", 45 }, { "Rim", 47 } }},                                         0.10f, 0.30f },
-        { "floor",  "Floor Tom", tomType,   2, {{ { "Hit", 41 }, { "Rim", 43 } }},                                         0.40f, 0.30f },
-        { "crash1", "Crash 1",   crashType, 2, {{ { "Hit", 49 }, { "Choke", 28, true } }},                                -0.45f, 0.20f },
-        { "crash2", "Crash 2",   crashType, 2, {{ { "Hit", 57 }, { "Choke", 29, true } }},                                 0.45f, 0.20f },
-        { "ride",   "Ride",      rideType,  4, {{ { "Tip", 51 }, { "Bell", 53 }, { "Edge", 59 }, { "Choke", 30, true } }}, 0.35f, 0.15f },
-        { "fx",     "FX Cymbal", fxType,    2, {{ { "Hit", 52 }, { "Choke", 31, true } }},                                 0.55f, 0.20f },
-        { "perc1",  "Perc 1",    percType,  1, {{ { "Hit", 39 } }},                                                        0.00f, 0.25f },
-        { "perc2",  "Perc 2",    percType,  1, {{ { "Hit", 54 } }},                                                       -0.50f, 0.25f },
-        { "perc3",  "Perc 3",    percType,  1, {{ { "Hit", 56 } }},                                                        0.30f, 0.25f },
-        { "perc4",  "Perc 4",    percType,  1, {{ { "Hit", 70 } }},                                                        0.50f, 0.25f },
+        { "kick",   "Kick",      kickType,  1, {{ { "Hit", 36 } }},                                                        0.00f, 0.10f, 0.15f },
+        { "snare",  "Snare",     snareType, 3, {{ { "Hit", 38 }, { "Rim", 40 }, { "Side Stick", 37 } }},                  -0.10f, 0.30f, 0.45f },
+        { "hihat",  "Hi-Hat",    hihatType, 4, {{ { "Closed", 42 }, { "Pedal", 44 }, { "Open", 46 }, { "Swish", 26 } }},  -0.35f, 0.15f, 0.70f },
+        { "tom1",   "Tom 1",     tomType,   2, {{ { "Hit", 48 }, { "Rim", 50 } }},                                        -0.15f, 0.30f, 0.45f },
+        { "tom2",   "Tom 2",     tomType,   2, {{ { "Hit", 45 }, { "Rim", 47 } }},                                         0.10f, 0.30f, 0.45f },
+        { "floor",  "Floor Tom", tomType,   2, {{ { "Hit", 41 }, { "Rim", 43 } }},                                         0.40f, 0.30f, 0.45f },
+        { "crash1", "Crash 1",   crashType, 2, {{ { "Hit", 49 }, { "Choke", 28, true } }},                                -0.45f, 0.20f, 0.90f },
+        { "crash2", "Crash 2",   crashType, 2, {{ { "Hit", 57 }, { "Choke", 29, true } }},                                 0.45f, 0.20f, 0.90f },
+        { "ride",   "Ride",      rideType,  4, {{ { "Tip", 51 }, { "Bell", 53 }, { "Edge", 59 }, { "Choke", 30, true } }}, 0.35f, 0.15f, 0.80f },
+        { "fx",     "FX Cymbal", fxType,    2, {{ { "Hit", 52 }, { "Choke", 31, true } }},                                 0.55f, 0.20f, 0.90f },
+        { "perc1",  "Perc 1",    percType,  1, {{ { "Hit", 39 } }},                                                        0.00f, 0.25f, 0.40f },
+        { "perc2",  "Perc 2",    percType,  1, {{ { "Hit", 54 } }},                                                       -0.50f, 0.25f, 0.40f },
+        { "perc3",  "Perc 3",    percType,  1, {{ { "Hit", 56 } }},                                                        0.30f, 0.25f, 0.40f },
+        { "perc4",  "Perc 4",    percType,  1, {{ { "Hit", 70 } }},                                                        0.50f, 0.25f, 0.40f },
     }};
     return defs;
 }

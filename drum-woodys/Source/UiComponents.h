@@ -10,7 +10,8 @@ namespace woody
 class LabeledKnob : public juce::Component
 {
 public:
-    LabeledKnob (juce::AudioProcessorValueTreeState&, const juce::String& paramId, const juce::String& caption);
+    LabeledKnob (juce::AudioProcessorValueTreeState&, const juce::String& paramId, const juce::String& caption,
+                 juce::Colour colour = colours::accent);
     void resized() override;
     void setTooltip (const juce::String& text) { slider.setTooltip (text); }
 
@@ -26,10 +27,11 @@ class MidiDragButton : public juce::Component,
                        public juce::SettableTooltipClient
 {
 public:
-    explicit MidiDragButton (const juce::String& text);
+    explicit MidiDragButton (const juce::String& text, bool compact = false);
 
     std::function<Sequence()> getSequence;
     std::function<juce::String()> getName;
+    std::function<float()> getTiming;
 
     void paint (juce::Graphics&) override;
     void mouseDrag (const juce::MouseEvent&) override;
@@ -37,6 +39,7 @@ public:
 
 private:
     juce::String text;
+    bool compact;
     bool dragging = false;
 };
 
@@ -54,6 +57,7 @@ public:
 
     int getIdealHeight() const;
 
+    std::function<void()> onEditStart;   // before a click changes the pattern (for undo)
     std::function<void()> onChange;
     std::function<void (int note, float velocity)> onAudition;
 
@@ -82,5 +86,35 @@ private:
 
     bool paintAdds = true;
     Cell lastPainted;
+};
+
+// Vertical peak meter with a falling bar and a short peak hold.
+class LevelMeter : public juce::Component
+{
+public:
+    void setLevel (float linearPeak);
+    void paint (juce::Graphics&) override;
+
+private:
+    float level = 0.0f, hold = 0.0f;
+    int holdTicks = 0;
+};
+
+// Segmented pill control used for the main tabs.
+class PillTabs : public juce::Component
+{
+public:
+    explicit PillTabs (const juce::StringArray& names);
+
+    std::function<void (int)> onChange;
+    void setSelected (int index, bool notify = true);
+    int getSelected() const { return selected; }
+
+    void paint (juce::Graphics&) override;
+    void mouseDown (const juce::MouseEvent&) override;
+
+private:
+    juce::StringArray names;
+    int selected = 0;
 };
 } // namespace woody
