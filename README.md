@@ -6,6 +6,22 @@ Audio plugins (VST3) built with [JUCE](https://juce.com).
 | --- | --- |
 | [Drum Woodys](drum-woodys/) | Acoustic drum sampler in the spirit of Addictive Drums: pick each kit piece from any kit, built-in groove library, step editor, song arranger and MIDI drag-and-drop into the DAW. |
 
+| [Synth Woodys](synth-woodys/) | Polyphonic synthesizer that blends an analog-style oscillator with a wavetable oscillator, ladder filter, modulation matrix and effects. |
+
+### Synth Woodys
+
+- **Osc A (analog)** – saw, square/pulse (with pulse width), triangle and sine, band-limited with polyBLEP.
+- **Osc B (wavetable)** – 6 generated wavetables (Basic, Digital, Vocal, Organ, Glass, Growl) with 8 key frames each;
+  the position control morphs between frames. Tables are band-limited per octave to avoid aliasing.
+- **Unison** – up to 7 stacked voices per oscillator with detune and stereo spread, plus sub oscillator and noise.
+- **Filter** – ladder filter with drive (low pass 24/12, band pass, high pass), envelope amount and keytracking.
+- **Modulation** – two ADSR envelopes (volume, filter), two LFOs (sine, triangle, saw, square, random) and a 4-slot
+  matrix (LFO 1/2, filter envelope, velocity, mod wheel to cutoff, resonance, pitch, wavetable position, pulse width,
+  osc levels, volume).
+- **Effects** – drive, chorus, ping-pong delay, reverb, master level with soft limiter.
+- **Presets** – factory sounds plus your own saved sounds. 16 voices, sustain pedal, pitch bend (±2 st), mod wheel.
+- Resizable window with on-screen keyboard.
+
 ### Drum Woodys
 
 - **Kit** – abstract kit map with 14 slots (kick, snare, hi-hat, 3 toms, 2 crashes, ride, FX cymbal, 4 percussion).
@@ -36,7 +52,8 @@ cmake -B build -G "Visual Studio 17 2022" -A x64
 cmake --build build --config Release
 ```
 
-Output: `build/drum-woodys/DrumWoodys_artefacts/Release/VST3/Drum Woodys.vst3`
+Output: `build/drum-woodys/DrumWoodys_artefacts/Release/VST3/Drum Woodys.vst3` and
+`build/synth-woodys/SynthWoodys_artefacts/Release/VST3/Synth Woodys.vst3`
 (and a `Standalone/Drum Woodys.exe` for testing without a DAW).
 
 ## Kits

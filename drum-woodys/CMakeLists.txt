@@ -24,7 +24,9 @@ target_sources(DrumWoodys PRIVATE
     Source/DrumEngine.cpp
     Source/Patterns.cpp
     Source/PatternLibrary.cpp
-    Source/WoodyLookAndFeel.cpp)
+    ../common/WoodyTheme.cpp)
+
+target_include_directories(DrumWoodys PRIVATE ../common)
 
 # UI text and the groove library contain accents
 if(MSVC)

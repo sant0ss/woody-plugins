@@ -12,4 +12,4 @@ cd /d D:\woody-plugins
 if not exist build\CMakeCache.txt (
   %CMAKE% -B build -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl || exit /b 1
 )
-%CMAKE% --build build --target DrumWoodys_VST3 DrumWoodys_Standalone || exit /b 1
+%CMAKE% --build build --target DrumWoodys_VST3 DrumWoodys_Standalone SynthWoodys_VST3 SynthWoodys_Standalone || exit /b 1

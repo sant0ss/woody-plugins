@@ -1,4 +1,4 @@
-#include "WoodyLookAndFeel.h"
+#include "WoodyTheme.h"
 
 namespace woody
 {
