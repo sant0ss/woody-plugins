@@ -8,6 +8,37 @@ Audio plugins (VST3) built with [JUCE](https://juce.com).
 
 | [Synth Woodys](synth-woodys/) | Polyphonic synthesizer that blends an analog-style oscillator with a wavetable oscillator, ladder filter, modulation matrix and effects. |
 
+| [EQ Woodys](eq-woodys/) | 16-band parametric equalizer with zero-latency and linear-phase modes, per-band stereo placement (stereo, L, R, mid, side), spectrum analyzer and per-band saturation. |
+| [Sat Woodys](sat-woodys/) | Saturator with five anti-aliased curves, tone, focus band, mid/side, oversampling and auto-gain. |
+| [Comp Woodys](comp-woodys/) | Compressor with a single-band mode and a 4-band Linkwitz-Riley multiband mode. |
+
+### EQ Woodys
+
+- **16 bands**, each a bell, low/high shelf, low/high cut (6 to 96 dB/oct), notch, band pass or tilt shelf. Drag nodes on the
+  curve, scroll to change Q, double-click to add or remove a band.
+- **Zero Latency** mode: cascaded biquads with sliding coefficients (no clicks while moving a band).
+- **Linear Phase** mode: the combined response is turned into symmetric FIR filters (inverse FFT + window) and applied by
+  partitioned convolution. No phase distortion; latency is half the filter length (Low to Max = 2048 to 16384 taps).
+  Mid/side bands are handled exactly by combining the bands as 2x2 matrices of zero-phase responses.
+- **Per-band placement**: stereo, left, right, mid or side.
+- **Per-band saturation**: only the signal around the band is saturated, with anti-aliased curves (soft, tube, tape, hard, fold).
+- Pre/post spectrum analyzer, output gain, bypass.
+
+### Sat Woodys
+
+- Five curves (soft, tube, tape, hard, fold) using first-order antiderivative anti-aliasing (no latency), plus 2x/4x/8x oversampling.
+- Input, drive, tone, bias, mix, output, auto-gain; stereo, mid-only or side-only; focus low/high cut so only part of the
+  spectrum is saturated while the rest passes untouched. Live transfer curve and waveform view.
+
+### Comp Woodys
+
+- **Single band**: threshold, ratio (up to limit), attack, release (or auto), soft knee, makeup (or auto), parallel mix,
+  sidechain high-pass, stereo link, peak/RMS detector, lookahead, stereo or mid/side.
+- **Multiband**: 4 bands split by 4th-order Linkwitz-Riley crossovers (adjustable, sum is flat), with threshold, ratio, attack,
+  release, makeup, solo and bypass per band.
+
+The DSP of the EQ, saturator and compressor is checked by console test programs (`run-tests.bat`, `run-test-one.bat`).
+
 ### Synth Woodys
 
 - **Osc A (analog)** – saw, square/pulse (with pulse width), triangle and sine, band-limited with polyBLEP.
@@ -54,7 +85,7 @@ cmake --build build --config Release
 
 Output: `build/drum-woodys/DrumWoodys_artefacts/Release/VST3/Drum Woodys.vst3` and
 `build/synth-woodys/SynthWoodys_artefacts/Release/VST3/Synth Woodys.vst3`
-(and a `Standalone/Drum Woodys.exe` for testing without a DAW).
+Each plugin also builds a `Standalone` app for testing without a DAW.
 
 ## Kits
 

@@ -8,5 +8,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # JUCE is shared by every Woody plugin
 add_subdirectory(JUCE)
 
-add_subdirectory(drum-woodys)
-add_subdirectory(synth-woodys)
+# Which plugins to configure; pass -DWOODY_PLUGINS="a;b" to build only some of them.
+# A plugin folder that does not exist yet is skipped.
+set(WOODY_PLUGINS "drum-woodys;synth-woodys;eq-woodys;sat-woodys;comp-woodys" CACHE STRING "Plugins to configure")
+
+foreach(plugin IN LISTS WOODY_PLUGINS)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${plugin}/CMakeLists.txt")
+        add_subdirectory(${plugin})
+    endif()
+endforeach()
