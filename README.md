@@ -100,3 +100,12 @@ mkdir -p kits && cd kits
 curl -LO https://www.bandshed.net/sounds/AVLDrumkits_SFZ/BLACK_PEARL_2023_repack.zip
 unzip BLACK_PEARL_2023_repack.zip && rm BLACK_PEARL_2023_repack.zip
 ```
+
+## License
+
+Woody Plugins is free software, licensed under the **GNU Affero General Public License v3.0** (see [LICENSE](LICENSE)),
+the same license JUCE offers for open-source projects. You can use, study, change and share it under those terms.
+
+- [JUCE](https://juce.com) is included as a submodule and has its own license (AGPLv3 or a commercial JUCE licence).
+- The drum kits are **not** part of this repository; each kit keeps its own license (the AVL Drumkits are CC-BY-SA 3.0).
+- Compiled plugins distributed to others must come with a link to this source code.
